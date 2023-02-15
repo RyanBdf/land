@@ -95,9 +95,9 @@ services:
   #--------------
   mysql:
     container_name: land_mysql
-    image: mysql:5.7
+    image: mysql:5.6.23
     volumes:
-      - ./data/mysql/5.7:/var/lib/mysql
+      - ./data/mysql/5.6.23:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "hbJPDHcpjk1993*"
       TZ: Europe/Paris

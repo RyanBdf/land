@@ -21,7 +21,7 @@ apt-get update
 apt-get install pdftk
 
 #checkout files
-git checkout ./_build/docker/apache/Dockerfile
-git checkout ./_build/docker/apache/app_php.ini
+#git checkout ./_build/docker/apache/Dockerfile
+#git checkout ./_build/docker/apache/app_php.ini
 
-docker run -d --name winchapps_bsi -p 8081:80 --network land_default -v "/$(pwd)/:/var/www" --restart always winchapps_bsi
+docker run -d --name winchapps_bsi -p 8081:80 --network land_default -v "/$(pwd)/:/var/www/basededonneesunique" --restart always winchapps_bsi

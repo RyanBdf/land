@@ -1,0 +1,123 @@
+version: '3.9'
+
+services:
+  #--------------
+  # Traefik
+  #--------------
+  traefik:
+    container_name: land_traefik
+    image: traefik:v2.5.2
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - --certificatesresolvers.myresolver.acme.email=ryan.boudiaf@opretdevous.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`traefik.opretdevous.com`)
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      #MiddleWare redirect
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      #Global redirect https
+      - traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.redirs.entrypoints=web
+      - traefik.http.routers.redirs.middlewares=redirect-to-https
+      # MiddleWare secure
+      - traefik.http.routers.traefik.middlewares=authentification
+      - traefik.http.middlewares.authentification.basicauth.users=ryan:$$apr1$$x6mhebci$$c4n/24GaPFYZjhNYVFl7G1
+
+    restart: always
+
+  #--------------
+  # Gogs
+  #--------------
+  gogs-db:
+    container_name: land_gogs_db
+    image: postgres:11-alpine
+    volumes:
+      - ./data/gogs/postgres:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_DB: gogs
+      POSTGRES_USER: gogs
+      POSTGRES_PASSWORD: root
+
+  gogs:
+    container_name: land_gogs
+    image: gogs/gogs:0.12
+    ports:
+      - "2222:2222"
+    volumes:
+      - ./data/gogs/data:/data
+    links:
+      - gogs-db
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gogs.rule=Host(`gogs.opretdevous.com`)
+      - traefik.http.services.gogs.loadbalancer.server.port=3000
+      - traefik.http.routers.gogs.entrypoints=websecure
+      - traefik.http.routers.gogs.tls.certresolver=myresolver
+    restart: always
+
+  #--------------
+  # Jenkins
+  #--------------
+  jenkins:
+    container_name: land_jenkins
+    build: images/jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/jenkins:/var/jenkins_home
+      - ./:/var/land
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.opretdevous.com`)
+      - traefik.http.services.jenkins.loadbalancer.server.port=8080
+      - traefik.http.routers.jenkins.entrypoints=websecure
+      - traefik.http.routers.jenkins.tls.certresolver=myresolver
+    restart: always
+
+  #--------------
+  # Mysql + Phpmyadmin
+  #--------------
+  mysql:
+    container_name: land_mysql
+    image: mysql:5.7
+    volumes:
+      - ./data/mysql/5.7:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "hbJPDHcpjk1993*"
+      TZ: Europe/Paris
+    ports:
+      - "3306:3306"
+    restart: always
+
+  phpmyadmin:
+    container_name: land_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.opretdevous.com`)
+      - traefik.http.services.land_phpmyadmin.loadbalancer.server.port=80
+      - traefik.http.routers.land_phpmyadmin.entrypoints=websecure
+      - traefik.http.routers.land_phpmyadmin.tls.certresolver=myresolver
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100000000
+    restart: always

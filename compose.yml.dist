@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  traefik:
+    labels:
+      - traefik.http.routers.traefik.rule=Host(`traefik.localhost`)
+  gogs:
+    labels:
+      - traefik.http.routers.gogs.rule=Host(`gogs.localhost`)
+  jenkins:
+    labels:
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.localhost`)
+  phpmyadmin:
+    labels:
+      - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.localhost`)
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      PMA_USER: root
+      PMA_PASSWORD: root
+  mailhog:
+    container_name: land_mailhog
+    image: mailhog/mailhog
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailhog.rule=Host(`mailhog.localhost`)
+      - traefik.http.services.mailhog.loadbalancer.server.port=80
+      - traefik.http.routers.mailhog.entrypoints=web
+    environment:
+      - MH_API_BIND_ADDR=0.0.0.0:80
+      - MH_UI_BIND_ADDR=0.0.0.0:80
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    user: root
+    restart: always

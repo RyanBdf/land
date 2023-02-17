@@ -12,7 +12,7 @@ if [ ! -d $(pwd)/data/jenkins ]; then
 fi
 
 if [ ! -d $(pwd)/data/mysql ]; then
-  mkdir -p $(pwd)/data/mysql/5.7
+  mkdir -p $(pwd)/data/mysql/5.6.29
 fi
 
 if [ ! -d $(pwd)/data/jenkins ]; then

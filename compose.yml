@@ -23,11 +23,11 @@ services:
       - --certificatesresolvers.myresolver.acme.httpchallenge=true
       - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
       #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - --certificatesresolvers.myresolver.acme.email=ryan.boudiaf@opretdevous.com
+      - --certificatesresolvers.myresolver.acme.email=ryan.boudiaf@winchapps.com
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     labels:
       - traefik.enable=true
-      - traefik.http.routers.traefik.rule=Host(`traefik.opretdevous.com`)
+      - traefik.http.routers.traefik.rule=Host(`traefik.winchapps.com`)
       - traefik.http.services.traefik.loadbalancer.server.port=8080
       #MiddleWare redirect
       - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
@@ -66,7 +66,7 @@ services:
       - gogs-db
     labels:
       - traefik.enable=true
-      - traefik.http.routers.gogs.rule=Host(`gogs.opretdevous.com`)
+      - traefik.http.routers.gogs.rule=Host(`gogs.winchapps.com`)
       - traefik.http.services.gogs.loadbalancer.server.port=3000
       - traefik.http.routers.gogs.entrypoints=websecure
       - traefik.http.routers.gogs.tls.certresolver=myresolver
@@ -84,7 +84,7 @@ services:
       - ./:/var/land
     labels:
       - traefik.enable=true
-      - traefik.http.routers.jenkins.rule=Host(`jenkins.opretdevous.com`)
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.winchapps.com`)
       - traefik.http.services.jenkins.loadbalancer.server.port=8080
       - traefik.http.routers.jenkins.entrypoints=websecure
       - traefik.http.routers.jenkins.tls.certresolver=myresolver
@@ -95,9 +95,9 @@ services:
   #--------------
   mysql:
     container_name: land_mysql
-    image: mysql:5.6.23
+    image: mysql:5.6.29
     volumes:
-      - ./data/mysql/5.6.23:/var/lib/mysql
+      - ./data/mysql/5.6.29:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "hbJPDHcpjk1993*"
       TZ: Europe/Paris
@@ -110,7 +110,7 @@ services:
     image: phpmyadmin/phpmyadmin
     labels:
       - traefik.enable=true
-      - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.opretdevous.com`)
+      - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.winchapps.com`)
       - traefik.http.services.land_phpmyadmin.loadbalancer.server.port=80
       - traefik.http.routers.land_phpmyadmin.entrypoints=websecure
       - traefik.http.routers.land_phpmyadmin.tls.certresolver=myresolver

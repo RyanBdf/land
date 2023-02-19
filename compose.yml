@@ -104,6 +104,10 @@ services:
     ports:
       - "3306:3306"
     restart: always
+    networks:
+      net:
+        ipv4_address: 172.16.1.201
+
 
   phpmyadmin:
     container_name: land_phpmyadmin
@@ -121,3 +125,11 @@ services:
       PMA_PORT: 3306
       UPLOAD_LIMIT: 100000000
     restart: always
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.0.0/8
+          gateway: 172.16.0.1

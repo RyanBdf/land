@@ -17,4 +17,4 @@ apt-get update
 #git checkout ./_build/docker/apache/Dockerfile
 #git checkout ./_build/docker/apache/app_php.ini
 
-docker run -d --name "$project_name" -p 8081:80 --network land_winchapps_default -v "/$(pwd)/:/var/www/basededonneesunique" --restart always "$project_name"
+docker run -d --name "$project_name" -p 8081:80 --network land_winchapps_net -v "/$(pwd)/:/var/www/basededonneesunique" --restart always "$project_name"

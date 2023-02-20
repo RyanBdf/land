@@ -38,8 +38,9 @@ services:
       # MiddleWare secure
       - traefik.http.routers.traefik.middlewares=authentification
       - traefik.http.middlewares.authentification.basicauth.users=ryan:$$apr1$$x6mhebci$$c4n/24GaPFYZjhNYVFl7G1
-
     restart: always
+    networks:
+      - net
 
   #--------------
   # Gogs
@@ -107,23 +108,23 @@ services:
     networks:
       net:
         ipv4_address: 172.16.1.201
-
-
   phpmyadmin:
     container_name: land_phpmyadmin
     image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100000000
     labels:
       - traefik.enable=true
       - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.winchapps.com`)
       - traefik.http.services.land_phpmyadmin.loadbalancer.server.port=80
       - traefik.http.routers.land_phpmyadmin.entrypoints=websecure
       - traefik.http.routers.land_phpmyadmin.tls.certresolver=myresolver
+    networks:
+      - net
     depends_on:
       - mysql
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      UPLOAD_LIMIT: 100000000
     restart: always
 
 networks:
@@ -132,3 +133,4 @@ networks:
     ipam:
       config:
         - subnet: 172.16.1.0/24
+          gateway: 172.16.1.255

@@ -1,4 +1,6 @@
 #!/bin/bash
+. ./shell/source/func.sh
+. ./shell/source/color.sh
 
 #-----------------------------------
 # create folders
@@ -32,4 +34,8 @@ chown 1000 -R $(pwd)/data/jenkins
 #-----------------------------------
 docker-compose stop
 truncate -s 0 /var/lib/docker/containers/*/*-json.log
+clear
+echo "------------------------------"
+echo  "Running : " $(format "Green" "land_winchapps")
+echo "------------------------------"
 docker-compose up --build -d

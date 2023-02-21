@@ -15,7 +15,6 @@ services:
     labels:
       - traefik.http.routers.land_phpmyadmin.rule=Host(`phpmyadmin.localhost`)
     environment:
-      MYSQL_ROOT_PASSWORD: root
       PMA_USER: root
       PMA_PASSWORD: root
   mailhog:
